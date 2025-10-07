@@ -1,0 +1,29 @@
+@keyframes fade-out {
+  from {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+::view-transition-old(folder-view) {
+  animation: 250ms ease-out both fade-out;
+}
+
+::view-transition-new(folder-view) {
+  animation: 250ms ease-out both fade-in;
+}

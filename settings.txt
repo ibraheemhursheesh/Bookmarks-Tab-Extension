@@ -1,0 +1,4 @@
+-text color select
+-disable import from bookmarks toggle
+-grid column number 
+-clock 24/12 toggle

@@ -1,0 +1,25 @@
+do you need the BookmarkPreview.tsx
+
+
+
+
+considering the context of the three files and the application structure, i want you to build me the following rename bookmark functionality, here's how it should work:
+1. When the user clicks on the rename list item in the ContextMenu.tsx file, the span element inside the the corresponding parent Folder.tsx or Bookmark.tsx file that renders the ContextMenu.tsx file should become contentEditable, and the focus should be set to it, you should use a state variable to manage the editibity of the span element
+        <li onClick={}>
+          <svg></svg>
+          <span>Rename</span>
+        </li>
+
+2. When the user clicks outside the span element or presses the Enter key, the contentEditable should be set to false and the new title should be saved to the title of the corresponding bookmark in the underlying bookmarks API (chrome.bookmarks) using chrome.bookmarks.update which will automatically trigger a re-render in the useBookmarks custom hook and update the UI with the new title, and it will be automatically truncated in the Bookmark.tsx file as per the existing functionality:
+<span
+  className="wrap-anywhere text-[12.5px]"
+  id={`bookmarkTitle${item.id}`}
+>
+  {item.title.length > 12 ? item.title.slice(0, 12) + ".." : item.title}
+</span>
+
+3. If the user presses the Escape key, the contentEditable should be set to false and the title should revert to its previous value (new title not saved).
+
+4. Ensure that the renaming functionality works seamlessly for both bookmarks and folders.
+
+5. Empty titles are allowed since the bookmarks API allows them.
