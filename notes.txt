@@ -1,0 +1,46 @@
+cd ..: goes one step back
+dir/ls: table of content
+mkdir: creates a new directory/folder
+touch: creates a new file
+rm: remove a file
+rmdir: remove a folder, if empty
+
+git init: Initialized empty Git repository
+git status: the state of things in the dir.
+git add <filename>: add the file to the stage area
+git rm --cached <filename>: remove the file from the staging area.
+git add .: adds all the files to the staging area
+
+git commit -m "commit message": commits
+git log: see the commit history
+git log --oneline: short history
+git checkout <commit-id-from-history-oneline>: to see the code at an earlier commint in your editor
+git checkout master: latest change.
+git revert <commit-id>: make a new commit that deletes another commit, but you still have access to the earlier commit in histroy, when using revert , you will get a weird screen, to get out of it, just press shift + clone : , and then type wq
+
+you can get that deleted commit (reapply it) by reverting the commit that reverted the deleted commit
+
+git reset <commit-id>: uncommit and unstage all the commit after the commid specified, they are not deleted, but rather uncommit and unstage, so you can actually stage and commit them back again as one commit. 
+
+git reset <commid-id> --hard: this will delete all the commit after the commit specified
+
+
+git branch <branch-name>: creates a new branch
+git branch a: shows all the branches
+git checkout <branch-name>: moves you to the branch
+git checkout -b <branch-name>: creates a new branch and move to it.
+
+NOTE THAT: if you create a new branch and then do some commits to do and didn't merge it and moved back to the master branch your files in the editor will get back to its state before even creating that branch.
+
+git branch -D <branch-name>: delete the sub-branch
+
+git merge <branch-name>: merge a sub-branch with the mater branch
+NOTE THAT:  fast-forward method is used when the master branch didn't change from the time of creating the merged branch and the time of merging it, but if it changed, you use recrusive
+
+
+
+git push <repo-url> <branch-name>: puhses your local repo to an existing remote repo.
+git remote add <keyword> <repo-url>: create an alian for remote repo url that you can use instead of the <repo-url> in git push command, keyword is often origin
+
+
+git clone <repo-url>; clone a remote repo to your computer, it also sets the origin alian to the repo url, so then you can push your change to the remote repo.

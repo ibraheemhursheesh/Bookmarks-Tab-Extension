@@ -151,7 +151,7 @@ export default function MoveBookmarkDialog({
   return (
     <dialog
       ref={dialogRef}
-      className=" opacity-0 scale-95  transition-discrete   open:backdrop:backdrop-blur-sm starting:open:opacity-0 starting:open:scale-95 transition-all duration-300 open:opacity-100 open:scale-100 p-0 cursor-auto rounded-xl border-1 border-black/50  mx-auto mt-8 w-xl bg-white backdrop:bg-black/50"
+      className="**:font-roboto opacity-0 scale-95  transition-discrete   open:backdrop:backdrop-blur-sm starting:open:opacity-0 starting:open:scale-95 transition-all duration-300 open:opacity-100 open:scale-100 p-0 cursor-auto rounded-xl border-1 border-black/50  mx-auto mt-8 w-xl bg-white backdrop:bg-black/50"
       onClick={handleDialogClick}
     >
       <div className=" flex flex-col gap-5 h-[420px] px-7 py-4">

@@ -6,18 +6,13 @@ export default defineManifest({
   name: pkg.name,
   version: pkg.version,
   description:
-    "turn your bookmarksbar into a nice-looking UI that facilitates access to bookmarks, providing you with a better browsing experience",
+    "turn your bookmarks into a nice-looking UI that facilitates access to bookmarks, providing you with a better browsing experience",
   chrome_url_overrides: {
     newtab: "src/index.html",
   },
-  host_permissions: ["<all_urls>"],
-  permissions: [
-    "bookmarks",
-    "storage",
-    "unlimitedStorage",
-    // "favicon",
-  ],
-  action: {
-    default_title: "My Extension",
+  permissions: ["bookmarks", "storage", "unlimitedStorage"],
+  icons: {
+    "48": "icon48.png",
+    "128": "icon128.png",
   },
 });

@@ -150,7 +150,7 @@ export default function EditBookmark({
     <dialog
       closedby="any"
       onClose={handleCloseDialog}
-      className=" w-[70%] max-w-[535px] px-5 py-7 m-auto inset-0 cursor-auto rounded-xl border-1 border-black/75 backdrop:bg-black/50 opacity-0 scale-95 starting:open:opacity-0 starting:open:scale-95 open:opacity-100 open:scale-100 transition-all duration-300 transition-discrete ease-out "
+      className=" w-[70%] max-w-[535px] px-5 py-7 m-auto inset-0 cursor-auto rounded-xl border-1 border-black/75 backdrop:bg-black/50 opacity-0 scale-95 starting:open:opacity-0 starting:open:scale-95 open:opacity-100 open:scale-100 transition-all duration-300 transition-discrete ease-out **:font-roboto"
       ref={editDialogRef}
     >
       <form className="flex flex-col gap-5">

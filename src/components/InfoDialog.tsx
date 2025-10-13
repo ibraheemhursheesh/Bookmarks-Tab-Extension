@@ -8,7 +8,7 @@ export default function InfoDialog({ infoDialogRef }) {
       ref={infoDialogRef}
       closedBy="any"
       style={{ height: "stretch", width: "stretch" }}
-      className="mx-[25px] xs:mx-auto my-44 bg-white  max-w-[550px] rounded-lg opacity-0 scale-95 transition-discrete   open:backdrop:backdrop-blur-sm  starting:open:opacity-0 starting:open:scale-95 transition-all duration-300 open:opacity-100 open:scale-100 py-10 px-4"
+      className="mx-[25px] xs:mx-auto my-30 max-h-[550px] bg-white  max-w-[550px] rounded-lg opacity-0 scale-95 transition-discrete   open:backdrop:backdrop-blur-sm  starting:open:opacity-0 starting:open:scale-95 transition-all duration-300 open:opacity-100 open:scale-100 py-10 px-4"
     >
       <div className="overflow-auto h-full flex flex-col items-center px-6 custom-scrollbar">
         <button
@@ -30,7 +30,7 @@ export default function InfoDialog({ infoDialogRef }) {
             <path d="m6 6 12 12" data--h-bstatus="0OBSERVED" />
           </svg>{" "}
         </button>
-        <img src="/avatar.png" alt="" className="size-32" />
+        <img src="/avatar.png" alt="" className="size-32 rounded-full border" />
         <div className="flex gap-3 items-center">
           <a href="https://www.upwork.com/freelancers/~014ce4d152e17b2b6a">
             <svg

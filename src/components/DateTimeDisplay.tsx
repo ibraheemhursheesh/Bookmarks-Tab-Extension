@@ -37,7 +37,7 @@ export default function DateTimeDisplay() {
   });
 
   return (
-    <div className="*:font-fira mt-12 text-center text-white mb-10">
+    <div className="*:font-fira my-10 text-center text-white ">
       <div className="text-[60px] font-semibold">{timeString}</div>
       <div className="-mt-[3px] text-base">{dateString}</div>
     </div>
