@@ -52,12 +52,12 @@ export default function CarouselDialog({
     const file = event.target.files[0];
     if (!file) return;
 
-    console.log(file.size * 0.001);
+    // console.log(file.size * 0.001);
 
     setIsAddingImage(true);
     let resizedBlob = await reduce.toBlob(file, { max: 1200 });
     const previewBlob = await reduce.toBlob(file, { max: 200 });
-    console.log("Resized blob:", resizedBlob.size * 0.001);
+    // console.log("Resized blob:", resizedBlob.size * 0.001);
 
     const targetSize = 1 * 1024 * 1024; // 1MB
     let quality = 0.9;
@@ -91,7 +91,7 @@ export default function CarouselDialog({
         previewPromise,
       ]);
 
-      // console.log(backgroundDataUrl, previewDataUrl);
+      // // console.log(backgroundDataUrl, previewDataUrl);
       // Store both images in chrome.storage.local
       const imageId = addImage({
         preview: previewDataUrl,
@@ -103,7 +103,7 @@ export default function CarouselDialog({
       // Set the newly uploaded image as current background
       // setBackgroundImage(`uploaded_${imageId}`);
 
-      console.log("Image uploaded, stored, and adaded successfully");
+      // console.log("Image uploaded, stored, and adaded successfully");
     } catch (error) {
       console.error("Error uploading image:", error);
     }

@@ -123,11 +123,11 @@ export default function App() {
     }
 
     if (state === "moved") {
-      console.log(
-        `${draggedElementIndex} colliding with an element that is already moved ${collidingElementIndex}`
-      );
-      console.log(originalLeft - translatedLeft);
-      console.log(movedElements);
+      // // console.log(
+      //   `${draggedElementIndex} colliding with an element that is already moved ${collidingElementIndex}`
+      // );
+      // // console.log(originalLeft - translatedLeft);
+      // // console.log(movedElements);
       if (collidingElementPosition === "before") {
         setMovedElements((movedElements) =>
           movedElements.filter(
@@ -142,7 +142,7 @@ export default function App() {
         );
       }
     } else if (state === "unmoved") {
-      console.log("colliding wit an element that hasn't moved yet");
+      // // console.log("colliding wit an element that hasn't moved yet");
       const startIndex =
         collidingElementPosition === "before"
           ? collidingElementIndex
@@ -257,12 +257,12 @@ export default function App() {
               )
           ),
         };
-        // console.log("overlap =>", overlap);
+        // // console.log("overlap =>", overlap);
 
         // If there's any overlap, log the dimensions
         if (overlap.width > 0 && overlap.height > 0) {
           // console.clear();
-          // console.log("Overlap area:", overlap);
+          // // console.log("Overlap area:", overlap);
           collisions.current.push({
             collidingElement: droppable,
             width: overlap.width,
@@ -272,7 +272,7 @@ export default function App() {
       }
 
       newPosition.current = [];
-      // console.log("droppableContainers while looping", droppableContainers);
+      // // console.log("droppableContainers while looping", droppableContainers);
       for (const droppable of droppableContainers.current) {
         const targetRect = droppable.coordinates;
 
@@ -304,7 +304,7 @@ export default function App() {
               )
           ),
         };
-        // console.log("overlap =>", overlap);
+        // // console.log("overlap =>", overlap);
         if (overlap.width > 0 && overlap.height > 0) {
           newPosition.current.push(droppable);
         }
@@ -315,16 +315,16 @@ export default function App() {
 
         setScale(false);
 
-        console.log(newDroppableArea.current);
+        // console.log(newDroppableArea.current);
       } else if (
         collisions.current.length === 0 &&
         newPosition.current.length
       ) {
-        console.log("zero collisions and one newPosition");
+        // console.log("zero collisions and one newPosition");
         const collidingItem =
           newPosition.current[newPosition.current.length - 1];
 
-        console.log("collidingItem", collidingItem);
+        // console.log("collidingItem", collidingItem);
         newDroppableArea.current = {
           state: "unmoved",
           position: "after",
@@ -332,7 +332,7 @@ export default function App() {
           action: "move",
           area: collidingItem.coordinates,
         };
-        console.log("newDroppableArea", newDroppableArea.current);
+        // console.log("newDroppableArea", newDroppableArea.current);
         setScale(false);
       } else if (collisions.current.length > 0) {
         const collidingItem = collisions.current[collisions.current.length - 1];
@@ -345,24 +345,24 @@ export default function App() {
             draggedElementIndex
           );
         } else {
-          console.log("area");
+          // console.log("area");
 
           const { width, height } = collidingItem;
 
-          console.log(width, height);
+          // console.log(width, height);
 
           if (width > 24 && height > 24) {
-            console.log("insert");
+            // console.log("insert");
 
             newDroppableArea.current = {
               action: "insert",
               draggedElementIndex,
               collidingElementId: collidingItem.collidingElement.id,
             };
-            console.log("newDroppableArea", newDroppableArea.current);
+            // console.log("newDroppableArea", newDroppableArea.current);
             setScale(true);
           } else {
-            console.log("move");
+            // console.log("move");
 
             setScale(false);
 
@@ -376,7 +376,7 @@ export default function App() {
         setScale(false);
       }
 
-      console.log(newDroppableArea.current);
+      // console.log(newDroppableArea.current);
     }
   }
 
@@ -390,11 +390,11 @@ export default function App() {
   function scrollContainer(pixelsToScroll) {
     const element = scrollableContainer.current;
     element.scrollBy(0, pixelsToScroll);
-    // console.log(element.scrollTopMax);
-    console.log("here are the values");
-    // console.log(element.scrollTop);
-    // console.log(element.clientHeight);
-    // console.log(element.scrollHeight);
+    // // console.log(element.scrollTopMax);
+    // console.log("here are the values");
+    // // console.log(element.scrollTop);
+    // // console.log(element.clientHeight);
+    // // console.log(element.scrollHeight);
     atTop.current = element.scrollTop === 0;
     atBottom.current =
       element.scrollTop + element.clientHeight === element.scrollHeight;
@@ -411,35 +411,35 @@ export default function App() {
   }
 
   function handleScrollDown() {
-    // console.log("handleScrollDown");
+    // // console.log("handleScrollDown");
 
-    // console.log("we're scrolling, bud");
+    // // console.log("we're scrolling, bud");
     scrollContainer(5);
 
     const id = setInterval(() => {
-      // console.log("we're scrolling..");
+      // // console.log("we're scrolling..");
       scrollContainer(5);
     }, 12);
     intervalId.current = id;
-    // console.log("interval id just set", intervalId.current);
+    // // console.log("interval id just set", intervalId.current);
   }
 
   function handleScrollUp() {
-    // console.log("handleScrollUp");
+    // // console.log("handleScrollUp");
     scrollContainer(-5);
     const id = setInterval(() => {
-      // console.log("we're scrolling..");
+      // // console.log("we're scrolling..");
       scrollContainer(-5);
     }, 12);
     intervalId.current = id;
-    // console.log("interval id just set", intervalId.current);
+    // // console.log("interval id just set", intervalId.current);
   }
 
   const stoppedScrollingDown = useRef(false);
 
   function handlePointerMove(e) {
     if (pointerDownInfo.current?.pointerDownClientX) {
-      // console.log("pointermove event fired white the pointer is down");
+      // // console.log("pointermove event fired white the pointer is down");
       const {
         draggedElementIndex,
         id,
@@ -448,10 +448,10 @@ export default function App() {
         pointerDownClientY,
         tragetBoundingRect,
       } = pointerDownInfo.current;
-      // console.log("pointermve");
+      // // console.log("pointermve");
       const pointerMoveClientX = e.clientX;
       const pointerMoveClientY = e.clientY;
-      // console.log("scrollTop value while dragging", scrollTop);
+      // // console.log("scrollTop value while dragging", scrollTop);
       const deltaX = pointerMoveClientX - pointerDownClientX;
       const deltaY = pointerMoveClientY - pointerDownClientY - scrollTop;
 
@@ -460,20 +460,20 @@ export default function App() {
 
         const targetParentRect = target.parentElement.getBoundingClientRect();
         const gridRect = scrollableContainer.current.getBoundingClientRect();
-        // // console.log(targetParentRect);
-        // // console.log(gridRect);
+        // // // console.log(targetParentRect);
+        // // // console.log(gridRect);
         const isScrollingDown = targetParentRect.bottom > gridRect.bottom + 48;
         const isScrollingUp = targetParentRect.bottom < gridRect.top - 40;
-        // console.log("scrollDown value", scrollDown.current);
+        // // console.log("scrollDown value", scrollDown.current);
 
-        // console.log("interval id to be cleared", intervalId.current);
+        // // console.log("interval id to be cleared", intervalId.current);
 
         window.clearInterval(intervalId.current);
 
         if (isScrollingDown || isScrollingUp) {
-          console.log("scrolling detected");
-          console.log("atTop", atTop.current);
-          console.log("atBottom", atBottom.current);
+          // console.log("scrolling detected");
+          // console.log("atTop", atTop.current);
+          // console.log("atBottom", atBottom.current);
         }
 
         if (isScrollingDown && !atBottom.current) {
@@ -485,17 +485,17 @@ export default function App() {
           window.clearTimeout(timeoutId.current);
           handleScrollUp();
         } else {
-          console.log("no scrolling detected");
+          // console.log("no scrolling detected");
 
           const targetBoundingRect = target.getBoundingClientRect();
 
-          console.log("targetBoundingRect.top", targetBoundingRect.bottom);
-          console.log("gridRect.top", gridRect.top - 40);
+          // console.log("targetBoundingRect.top", targetBoundingRect.bottom);
+          // console.log("gridRect.top", gridRect.top - 40);
 
-          console.log(
-            "should checkCollisions?",
-            targetBoundingRect.bottom > gridRect.top - 40
-          );
+          // console.log(
+          //   "should checkCollisions?",
+          //   targetBoundingRect.bottom > gridRect.top - 40
+          // );
 
           const isTargetInsideScrollableContainerY =
             targetBoundingRect.bottom > gridRect.top - 40 &&
@@ -504,7 +504,7 @@ export default function App() {
           //   targetBoundingRect.left > scrollableContainerBoundingRect.left &&
           //   targetBoundingRect.right < scrollableContainerBoundingRect.right;
 
-          // console.log(
+          // // console.log(
           //   isTargetInsideScrollableContainerY,
           //   isTargetInsideScrollableContainerX
           // );
@@ -513,7 +513,7 @@ export default function App() {
             isTargetInsideScrollableContainerY
             // && isTargetInsideScrollableContainerX
           ) {
-            console.log("we're inside the scrollable container");
+            // console.log("we're inside the scrollable container");
             timeoutId.current = debouncedCheckCollisions(
               target,
               draggedElementIndex,
@@ -522,7 +522,7 @@ export default function App() {
               "pointer-move"
             );
           } else {
-            console.log("we're outside the scrollable container");
+            // console.log("we're outside the scrollable container");
             // setScale
             window.clearTimeout(timeoutId.current);
           }
@@ -533,11 +533,11 @@ export default function App() {
 
   function handlePointerUp(e) {
     // console.clear();
-    // console.log("pointer up");
+    // // console.log("pointer up");
     if (pointerDownInfo.current) {
       window.clearInterval(intervalId.current);
       allowUpdatingScrollTopAfterScroll.current = true;
-      console.log("scrollTop new value", scrollableContainer.current.scrollTop);
+      // console.log("scrollTop new value", scrollableContainer.current.scrollTop);
       setScrollTop(scrollableContainer.current.scrollTop);
       atTop.current = false;
       atBottom.current = false;
@@ -549,13 +549,13 @@ export default function App() {
         parentId,
       } = pointerDownInfo.current;
 
-      // console.log(parentId);
+      // // console.log(parentId);
 
       pointerDownInfo.current = { id };
-      // console.log(timeoutId.current);
+      // // console.log(timeoutId.current);
       window.clearTimeout(timeoutId.current);
 
-      // console.log(newDroppableArea.current);
+      // // console.log(newDroppableArea.current);
 
       if (newDroppableArea.current) {
         const {
@@ -566,11 +566,11 @@ export default function App() {
           collidingElementIndex,
           collidingElementId,
         } = newDroppableArea.current;
-        console.log(newDroppableArea.current);
+        // console.log(newDroppableArea.current);
         if (action === "move") {
-          console.log(draggedItemOriginalCoordinates.y);
-          console.log(collidingItemCurrentCoordinates.y);
-          console.log(scrollTop);
+          // console.log(draggedItemOriginalCoordinates.y);
+          // console.log(collidingItemCurrentCoordinates.y);
+          // console.log(scrollTop);
           newDroppableArea.current = null;
           const deltaX =
             draggedItemOriginalCoordinates.x -
@@ -579,14 +579,14 @@ export default function App() {
             draggedItemOriginalCoordinates.y -
             collidingItemCurrentCoordinates.y +
             scrollTop;
-          console.log(deltaX, deltaY);
+          // console.log(deltaX, deltaY);
 
-          console.log(
-            draggedItemOriginalCoordinates,
-            collidingItemCurrentCoordinates
-          );
+          // console.log(
+          //   draggedItemOriginalCoordinates,
+          //   collidingItemCurrentCoordinates
+          // );
 
-          console.log("deltaY", -deltaY);
+          // console.log("deltaY", -deltaY);
 
           setDelta({ deltaX: -deltaX, deltaY: -deltaY, transition: true });
 
@@ -608,7 +608,7 @@ export default function App() {
             );
             setMovedElements([]);
 
-            console.log(draggedElementIndex > newIndex);
+            // console.log(draggedElementIndex > newIndex);
             chrome.bookmarks.move(id, {
               // https://stackoverflow.com/questions/13264060/chrome-bookmarks-api-using-move-to-reorder-bookmarks-in-the-same-folder
               index: draggedElementIndex > newIndex ? newIndex : newIndex + 1,
@@ -674,7 +674,7 @@ export default function App() {
           }, 300);
         }
       } else {
-        console.log("null");
+        // console.log("null");
         // pointerDownInfo.current = null;
         // setDelta({});
         setDelta({ deltaX: 0, deltaY: -scrollTop, transition: true });
@@ -689,31 +689,31 @@ export default function App() {
   const checkGridColumnNumber = useMemo(
     () =>
       debounce(function () {
-        console.log(
-          Math.floor((listGrid.current.clientWidth - bookmarkWidth) / move + 1)
-        );
+        // console.log(
+        //   Math.floor((listGrid.current.clientWidth - bookmarkWidth) / move + 1)
+        // );
         setGridColumnNumber(
           Math.floor((listGrid.current.clientWidth - bookmarkWidth) / move + 1)
         );
 
-        console.log("grid column number resize");
+        // console.log("grid column number resize");
         setScrollTop(scrollableContainer.current.scrollTop);
-        console.log("grid column number2", gridColumnNumber);
+        // console.log("grid column number2", gridColumnNumber);
       }, 200),
     []
   );
 
   // grid column number
   useEffect(function () {
-    console.log(
-      Math.floor((listGrid.current.clientWidth - bookmarkWidth) / move + 1)
-    );
+    // console.log(
+    //   Math.floor((listGrid.current.clientWidth - bookmarkWidth) / move + 1)
+    // );
 
     setGridColumnNumber(
       Math.floor((listGrid.current.clientWidth - bookmarkWidth) / move + 1)
     );
 
-    console.log("grid column number1", gridColumnNumber);
+    // console.log("grid column number1", gridColumnNumber);
     window.addEventListener("resize", function () {
       checkGridColumnNumber();
     });
@@ -740,7 +740,7 @@ export default function App() {
   // get droppable containers.
   useEffect(
     function () {
-      console.log("getDroppableContainers effect is executed");
+      // console.log("getDroppableContainers effect is executed");
       getDroppableContainers();
       return () => {
         droppableContainers.current = [];
@@ -809,10 +809,10 @@ export default function App() {
             const movedEl = movedElements.find(
               (movedElement) => movedElement.index === index
             );
-            // console.log(movedEl);
-            // if (movedEl?.index) console.log(movedEl?.index);
-            // console.log(pointerDownInfo.current);
-            // console.log(movedEl?.index > pointerDownInfo.current?.index);
+            // // console.log(movedEl);
+            // if (movedEl?.index) // console.log(movedEl?.index);
+            // // console.log(pointerDownInfo.current);
+            // // console.log(movedEl?.index > pointerDownInfo.current?.index);
             return (
               <BookmarkItem
                 scrollableContainer={scrollableContainer}

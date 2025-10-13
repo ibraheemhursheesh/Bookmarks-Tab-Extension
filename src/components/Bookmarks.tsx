@@ -22,7 +22,7 @@ export default function Bookmarks({
 
     if (allowUpdatingScrollTopAfterScroll.current) {
       const scrollTop = scrollableContainer.current.scrollTop;
-      console.log("scrollTop new value", scrollTop);
+      // console.log("scrollTop new value", scrollTop);
       atTop.current = scrollTop === 0;
       atBottom.current =
         scrollTop + scrollableContainer.current.clientHeight ===

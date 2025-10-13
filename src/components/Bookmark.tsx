@@ -30,7 +30,7 @@ const Bookmark = memo(function ({
   bookmarkWidth,
   isMoveElementsAnimated,
 }) {
-  console.log(item);
+  // console.log(item);
   const defaultFaviconUrl = `https://www.faviconextractor.com/favicon/${
     new URL(item.url).hostname
   }?larger=true`;
@@ -40,8 +40,8 @@ const Bookmark = memo(function ({
   const titleRef = useRef(null);
 
   function isAtEdge(index) {
-    console.log(index);
-    console.log(Number.isInteger(index / gridColumnNumber));
+    // console.log(index);
+    // console.log(Number.isInteger(index / gridColumnNumber));
     return Number.isInteger(index / gridColumnNumber);
   }
 
@@ -84,7 +84,7 @@ const Bookmark = memo(function ({
   };
 
   const handleBlur = async (e) => {
-    console.log("blur");
+    // console.log("blur");
     const newTitle = e.target.textContent;
     setIsEditing(false);
     const _ = await chrome.bookmarks.update(item.id, { title: newTitle });
