@@ -100,7 +100,7 @@ export default function InfoDialog({ infoDialogRef }) {
               </g>
             </svg>
           </a>
-          <a className="" href="mailto:ibraheemhursheesh33@gmail.com">
+          <a href="mailto:ibraheemhursheesh33@gmail.com">
             <svg
               className="size-11.5"
               xmlns="http://www.w3.org/2000/svg"
@@ -160,11 +160,7 @@ export default function InfoDialog({ infoDialogRef }) {
         </div>
 
         <div className="mt-5">
-          <p
-            style={{ lineHeight: "22px" }}
-            className=""
-            className="text-sm text-center"
-          >
+          <p style={{ lineHeight: "22px" }} className="text-sm text-center">
             Hi, I&apos;m Ibrahim, a web developer who enjoys building
             nice-looking experiences on the web, if you're facing any issues or
             have any questions about this extension you can just{" "}
