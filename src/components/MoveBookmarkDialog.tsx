@@ -43,15 +43,15 @@ const FolderTree = ({
       <div
         className={`flex items-center p-2  rounded-sm cursor-pointer gap-4`}
         style={{
-          backgroundColor: isSelected ? "#d4d4d8  " : "",
+          backgroundColor: isSelected ? "#eee " : "",
         }}
         onClick={(e) => {
           e.preventDefault();
           onSelect(folder.id);
         }}
       >
-        <Folder size="22" />
-        <span className="text-sm">{folder.title}</span>
+        <Folder size="16" />
+        <span className="text-[13px]">{folder.title}</span>
         {hasChildren && (
           <button
             className="p-0 rounded-sm ml-auto"
@@ -71,9 +71,9 @@ const FolderTree = ({
       </div>
       {folder.isExpanded && folder.children && (
         <ul
+          className="starting:h-0 h-auto "
           style={{
             marginLeft,
-            borderLeft: "2px solid #333",
           }}
         >
           {folder.children
@@ -151,17 +151,17 @@ export default function MoveBookmarkDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="**:font-roboto opacity-0 scale-95  transition-discrete   open:backdrop:backdrop-blur-sm starting:open:opacity-0 starting:open:scale-95 transition-all duration-300 open:opacity-100 open:scale-100 p-0 cursor-auto rounded-xl border-1 border-black/50  mx-auto mt-8 w-xl bg-white backdrop:bg-black/50"
+      className=" opacity-0 scale-95  transition-discrete   open:backdrop:backdrop-blur-sm starting:open:opacity-0 starting:open:scale-95 transition-all duration-300 open:opacity-100 open:scale-100 p-0 cursor-auto rounded-xl border-1 border-black/50  mx-auto mt-8 w-lg bg-white backdrop:bg-black/50"
       onClick={handleDialogClick}
     >
-      <div className=" flex flex-col gap-5 h-[420px] px-7 py-4">
-        <div className="text-left ">
+      <div className=" flex flex-col gap-5 h-[420px] p-4">
+        {/* <div className="text-left ">
           <h2 className="text-lg font-semibold">Move to Folder</h2>
-        </div>
+        </div> */}
 
         <ul
           style={{ scrollbarWidth: "thin", scrollbarColor: "#333 #e4e4e7" }}
-          className="flex-1 overflow-y-auto max-w-md mx-9 flex flex-col gap-2"
+          className="flex-1 overflow-y-auto flex flex-col gap-2"
         >
           {rootFolders.map((folder) => (
             <FolderTree
