@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 
 import styles from "./ContextMenu.module.css";
 import EditBookmark from "./EditBookmark";
+import EditFolder from "./EditFolder";
 import DeleteBookmark from "./DeleteBookmark";
 import MoveBookmarkDialog from "./MoveBookmarkDialog";
 
@@ -19,11 +20,13 @@ export default function ContextMenu({
   setItemToDelete,
   index,
   actions,
+  folderIconSvg,
 }) {
   const editDialogRef = useRef(null);
   const removeDialogRef = useRef(null);
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const isFolder = !item.url;
 
   async function handleDelete() {
     await chrome.bookmarks.removeTree(id);
@@ -112,7 +115,7 @@ export default function ContextMenu({
           </svg>
           <span>Rename</span>
         </li>
-        {faviconUrl && (
+        {(faviconUrl || isFolder) && (
           <li
             className="py-[6px] pl-[13px] pr-10 text-sm flex items-center gap-3 rounded-sm hover:text-black hover:bg-zinc-200/50"
             onClick={(e) => {
@@ -140,14 +143,24 @@ export default function ContextMenu({
               <circle cx="7" cy="7" r="3" data--h-bstatus="0OBSERVED" />
             </svg>
             <span>Edit</span>{" "}
-            <EditBookmark
-              setIsHidden={setIsHidden}
-              id={id}
-              item={item}
-              faviconUrl={faviconUrl}
-              editDialogRef={editDialogRef}
-              setCurrentFolder={setCurrentFolder}
-            />
+            {isFolder ? (
+              <EditFolder
+                setIsHidden={setIsHidden}
+                id={id}
+                item={item}
+                folderIconSvg={folderIconSvg}
+                editDialogRef={editDialogRef}
+              />
+            ) : (
+              <EditBookmark
+                setIsHidden={setIsHidden}
+                id={id}
+                item={item}
+                faviconUrl={faviconUrl}
+                editDialogRef={editDialogRef}
+                setCurrentFolder={setCurrentFolder}
+              />
+            )}
           </li>
         )}
 

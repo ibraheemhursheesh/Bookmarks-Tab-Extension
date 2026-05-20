@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useRef, useEffect } from "react";
 import ContextMenu from "./ContextMenu";
+import { useFolderIconSvg } from "../hooks/useFolderIconSvg";
 export default function Folder({
   id,
   title,
@@ -25,6 +26,7 @@ export default function Folder({
   isMoveElementsAnimated,
 }) {
   const [isEditing, setIsEditing] = useState(isLastItem && item.isNewlyCreated);
+  const folderIconSvg = useFolderIconSvg(id);
 
   const titleRef = useRef(null);
   const folderIconRef = useRef(null);
@@ -40,7 +42,7 @@ export default function Folder({
         moveCursorToEnd(titleRef);
       }
     },
-    [isEditing]
+    [isEditing],
   );
 
   function moveCursorToEnd(titleRef) {
@@ -158,7 +160,14 @@ export default function Folder({
                 <path d="M 0 20 L 0 8 Q 0 0 8 0 L 20 0 C 24 0 26 4 28 4 L 40 4 Q 48 4 48 12 L 48 20 z"></path>
               </svg>
             </div>
-            <div className="w-full  h-[34px] bg-white border-2 border-[#e6e6e6] rounded-sm mt-[14px] relative"></div>
+            <div className="w-full h-[34px] bg-white border-2 border-[#e6e6e6] rounded-sm mt-[14px] relative flex items-center justify-center">
+              {folderIconSvg && (
+                <div
+                  className="pointer-events-none absolute  text-zinc-700"
+                  dangerouslySetInnerHTML={{ __html: folderIconSvg }}
+                />
+              )}
+            </div>
 
             {/* <img
               src="/folder-images/folder2r.png"
@@ -191,6 +200,7 @@ export default function Folder({
             setCurrentFolder={setCurrentFolder}
             item={item}
             id={id}
+            folderIconSvg={folderIconSvg}
             popoverRef={popoverRef}
             setWillBeDeleted={setItemToDelete}
           />
