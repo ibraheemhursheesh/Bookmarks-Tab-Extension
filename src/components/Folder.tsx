@@ -27,6 +27,7 @@ export default function Folder({
   const [isEditing, setIsEditing] = useState(isLastItem && item.isNewlyCreated);
 
   const titleRef = useRef(null);
+  const folderIconRef = useRef(null);
 
   const handleRename = (setEditing) => {
     setIsEditing(setEditing);
@@ -68,17 +69,31 @@ export default function Folder({
     const _ = await chrome.bookmarks.update(id, { title: newTitle });
   };
 
+  const handleFolderKeyDown = (e) => {
+    if (isEditing || e.target.isContentEditable) {
+      return;
+    }
+
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      folderIconRef.current?.click();
+    }
+  };
+
   return (
     <li
       style={{
         transition: isMoveElementsAnimated ? "transform 300ms ease" : "",
         transform: transformValue,
       }}
-      // tabIndex={0}
+      tabIndex={0}
+      role="button"
+      aria-label={`Open folder ${title}`}
       id={id}
-      className=""
+      className="rounded-sm focus-visible:outline-2 focus-visible:outline-white/70"
       onContextMenu={showContextMenu}
       onClick={handleFolderClick}
+      onKeyDown={handleFolderKeyDown}
 
       // style={
       //   delta?.deltaX
@@ -112,6 +127,7 @@ export default function Folder({
           }}
         >
           <div
+            ref={folderIconRef}
             style={{
               anchorName: `--anchor-${id}`,
               overflow: "hidden",
