@@ -21,6 +21,7 @@ export default function ContextMenu({
   index,
   actions,
   folderIconSvg,
+  folderColor,
 }) {
   const editDialogRef = useRef(null);
   const removeDialogRef = useRef(null);
@@ -149,6 +150,7 @@ export default function ContextMenu({
                 id={id}
                 item={item}
                 folderIconSvg={folderIconSvg}
+                folderColor={folderColor}
                 editDialogRef={editDialogRef}
               />
             ) : (

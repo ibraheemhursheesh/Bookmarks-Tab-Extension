@@ -1,8 +1,12 @@
 // @ts-nocheck
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { colors } from "../data/colors";
+
+const defaultFolderColor = colors[0];
 
 function parseFolderSvg(value) {
   const trimmedValue = value.trim();
@@ -34,37 +38,143 @@ function parseFolderSvg(value) {
   return { svg: svgElement.outerHTML, error: "" };
 }
 
+function isSameColor(firstColor, secondColor) {
+  return (
+    firstColor?.inside === secondColor?.inside &&
+    firstColor?.outside === secondColor?.outside
+  );
+}
+
+function FolderIconPreview({ folderIconSvg, folderColor }) {
+  return (
+    <div className="size-12 relative">
+      <div
+        className="w-full h-12
+      4 absolute top-0 left-0"
+      >
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 48 48"
+          fill={folderColor.outside}
+          stroke=""
+          strokeWidth="2"
+          className="relative top-[6px]"
+        >
+          <path d="M 0 20 L 0 8 Q 0 0 8 0 L 20 0 C 24 0 26 4 28 4 L 40 4 Q 48 4 48 12 L 48 20 z"></path>
+        </svg>
+      </div>
+      <div
+        className="w-full h-[34px] border-2 rounded-sm mt-[14px] relative flex items-center justify-center"
+        style={{
+          backgroundColor: folderColor.inside,
+          borderColor: folderColor.outside,
+        }}
+      >
+        {folderIconSvg && (
+          <div
+            className="pointer-events-none absolute text-zinc-700"
+            dangerouslySetInnerHTML={{ __html: folderIconSvg }}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function FolderColorPickerDialog({
+  colorDialogRef,
+  selectedFolderColor,
+  onSelectColor,
+  onPreviewColor,
+  onClearPreviewColor,
+}) {
+  return (
+    <dialog
+      ref={colorDialogRef}
+      closedby="any"
+      onClose={(e) => {
+        e.stopPropagation();
+        onClearPreviewColor();
+      }}
+      className="w-[260px] p-4 m-auto inset-0 cursor-auto rounded-xl border-1 border-black/75  opacity-0 scale-95 starting:open:opacity-0 starting:open:scale-95 open:opacity-100 open:scale-100 transition-all duration-300 transition-discrete ease-out **:font-roboto"
+    >
+      <div
+        className="grid grid-cols-4 gap-3"
+        onMouseLeave={onClearPreviewColor}
+      >
+        {colors.map((color) => {
+          const isSelected = isSameColor(color, selectedFolderColor);
+
+          return (
+            <button
+              key={`${color.inside}-${color.outside}`}
+              type="button"
+              aria-label="Choose folder color"
+              className="grid size-10 place-items-center rounded-md border border-black/10 bg-white cursor-pointer outline-2 outline-offset-2 outline-transparent focus-visible:outline-black/50"
+              style={{
+                outlineColor: isSelected ? color.outside : "",
+              }}
+              onMouseEnter={() => onPreviewColor(color)}
+              onFocus={() => onPreviewColor(color)}
+              onClick={() => {
+                onSelectColor(color);
+                colorDialogRef.current.close();
+              }}
+            >
+              <span
+                className="size-6 rounded-sm border-2"
+                style={{
+                  backgroundColor: color.inside,
+                  borderColor: color.outside,
+                }}
+              />
+            </button>
+          );
+        })}
+      </div>
+    </dialog>
+  );
+}
+
 export default function EditFolder({
   setIsHidden,
   editDialogRef,
   item,
   id,
   folderIconSvg,
+  folderColor = defaultFolderColor,
 }) {
   const [svgInput, setSvgInput] = useState(folderIconSvg || "");
   const [svgError, setSvgError] = useState("");
+  const [selectedFolderColor, setSelectedFolderColor] = useState(folderColor);
+  const [hoveredFolderColor, setHoveredFolderColor] = useState(null);
+  const colorDialogRef = useRef(null);
   const previewSvg = parseFolderSvg(svgInput).svg;
+  const previewFolderColor = hoveredFolderColor || selectedFolderColor;
 
-  async function saveFolderIconSvg(nextSvg) {
+  async function saveFolderSettings(nextSvg, nextFolderColor) {
     const result = await chrome.storage.local.get(id);
     const currentItemStorage = result[id] || {};
+    const nextItemStorage = { ...currentItemStorage };
 
-    if (!nextSvg) {
-      const { folderIconSvg, ...rest } = currentItemStorage;
-      if (Object.keys(rest).length) {
-        await chrome.storage.local.set({ [id]: rest });
-      } else {
-        await chrome.storage.local.remove(id);
-      }
-      return;
+    if (nextSvg) {
+      nextItemStorage.folderIconSvg = nextSvg;
+    } else {
+      delete nextItemStorage.folderIconSvg;
     }
 
-    await chrome.storage.local.set({
-      [id]: {
-        ...currentItemStorage,
-        folderIconSvg: nextSvg,
-      },
-    });
+    if (isSameColor(nextFolderColor, defaultFolderColor)) {
+      delete nextItemStorage.folderColor;
+    } else {
+      nextItemStorage.folderColor = nextFolderColor;
+    }
+
+    if (Object.keys(nextItemStorage).length) {
+      await chrome.storage.local.set({ [id]: nextItemStorage });
+    } else {
+      await chrome.storage.local.remove(id);
+    }
   }
 
   function handleCloseDialog() {
@@ -72,6 +182,8 @@ export default function EditFolder({
 
     if (editDialogRef.current.returnValue !== "submit") {
       setSvgInput(folderIconSvg || "");
+      setSelectedFolderColor(folderColor);
+      setHoveredFolderColor(null);
       setSvgError("");
       return;
     }
@@ -82,7 +194,7 @@ export default function EditFolder({
       return;
     }
 
-    saveFolderIconSvg(svg);
+    saveFolderSettings(svg, selectedFolderColor);
   }
 
   useEffect(
@@ -92,6 +204,13 @@ export default function EditFolder({
     [folderIconSvg],
   );
 
+  useEffect(
+    function () {
+      setSelectedFolderColor(folderColor);
+    },
+    [folderColor],
+  );
+
   return (
     <dialog
       closedby="any"
@@ -99,35 +218,31 @@ export default function EditFolder({
       className="w-[80%] max-w-[560px] px-5 py-7 m-auto inset-0 cursor-auto rounded-xl border-1 border-black/75 backdrop:bg-black/50 opacity-0 scale-95 starting:open:opacity-0 starting:open:scale-95 open:opacity-100 open:scale-100 transition-all duration-300 transition-discrete ease-out **:font-roboto"
       ref={editDialogRef}
     >
-      <form className="flex flex-col gap-5">
+      <form
+        className="flex flex-col gap-5"
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
+      >
         <div className="flex items-start gap-5">
-          <div className="grid size-20 place-items-center">
-            <div className="size-12 relative">
-              <div
-                className="w-full h-12
-              4 absolute top-0 left-0"
-              >
-                <svg
-                  width="48"
-                  height="48"
-                  viewBox="0 0 48 48"
-                  fill="#e6e6e6"
-                  stroke=""
-                  strokeWidth="2"
-                  className="relative top-[6px]"
-                >
-                  <path d="M 0 20 L 0 8 Q 0 0 8 0 L 20 0 C 24 0 26 4 28 4 L 40 4 Q 48 4 48 12 L 48 20 z"></path>
-                </svg>
-              </div>
-              <div className="w-full h-[34px] bg-white border-2 border-[#e6e6e6] rounded-sm mt-[14px] relative flex items-center justify-center">
-                {previewSvg && (
-                  <div
-                    className="pointer-events-none absolute text-zinc-700"
-                    dangerouslySetInnerHTML={{ __html: previewSvg }}
-                  />
-                )}
-              </div>
+          <div className="flex flex-col items-center gap-3">
+            <div className="grid size-20 place-items-center">
+              <FolderIconPreview
+                folderIconSvg={previewSvg}
+                folderColor={previewFolderColor}
+              />
             </div>
+            <button
+              type="button"
+              aria-label="Change folder color"
+              title="Change folder color"
+              className="grid size-8 place-items-center rounded-full bg-zinc-100 text-zinc-700 hover:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-black/50 cursor-pointer"
+              onClick={() => {
+                colorDialogRef.current.showModal();
+              }}
+            >
+              <Palette size={17} />
+            </button>
           </div>
           <div className="flex-1 text-left">
             <h3 className="text-lg leading-none font-semibold">Edit Folder</h3>
@@ -152,6 +267,16 @@ export default function EditFolder({
             )}
           </div>
         </div>
+        <FolderColorPickerDialog
+          colorDialogRef={colorDialogRef}
+          selectedFolderColor={selectedFolderColor}
+          onSelectColor={(color) => {
+            setSelectedFolderColor(color);
+            setHoveredFolderColor(null);
+          }}
+          onPreviewColor={setHoveredFolderColor}
+          onClearPreviewColor={() => setHoveredFolderColor(null)}
+        />
         <div className="flex justify-end gap-2">
           <Button
             value="cancel"
