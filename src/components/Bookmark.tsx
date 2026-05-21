@@ -3,6 +3,11 @@ import { memo, useEffect, useState, useRef } from "react";
 import ContextMenu from "./ContextMenu";
 
 import { useFaviconUrl } from "../hooks/useFaviconUrl";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { it } from "node:test";
 
 function faviconURL(u) {
@@ -37,6 +42,10 @@ const Bookmark = memo(function ({
   const faviconUrl = useFaviconUrl(item.id, defaultFaviconUrl);
   const [isEditing, setIsEditing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const isTitleTruncated = item.title.length > 12;
+  const displayedTitle = isTitleTruncated
+    ? item.title.slice(0, 12) + ".."
+    : item.title;
   const titleRef = useRef(null);
 
   function isAtEdge(index) {
@@ -69,7 +78,7 @@ const Bookmark = memo(function ({
         moveCursorToEnd(titleRef);
       }
     },
-    [isEditing]
+    [isEditing],
   );
 
   const handleKeyDown = async (e) => {
@@ -122,74 +131,78 @@ const Bookmark = memo(function ({
           width: bookmarkWidth + "px",
         }}
       >
-        <a
-          href={item.url}
-          onClick={handleAnchorClick}
-          draggable="false"
-          className=" relative h-[90.5px] flex flex-col items-center gap-[5px] text-white text-center cursor-pointer has-focus-visible:z-1"
-          style={{
-            transition: "scale 200ms",
-            scale: scale ? "0.8" : "1",
-            pointerEvents: delta?.deltaX !== undefined ? "none" : "auto",
-          }}
-        >
-          <img
-            onPointerDown={(e) =>
-              handlePointerDown(e, item.id, index, item.parentId)
-            }
-            style={{
-              anchorName: `--anchor-${item.id}`,
-              scale: delta?.deltaX !== undefined ? "1" : "",
-            }}
-            src={faviconUrl}
-            className="size-12 object-cover object-center rounded-sm select-none transition-all active:scale-95 "
-            id={`bookmarkIcon${item.id}`}
-            alt="Favicon"
-            draggable="false"
-            data-droppable="true"
-          />
-          {isRedirecting && (
-            <div
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <a
+              href={item.url}
+              onClick={handleAnchorClick}
+              draggable="false"
+              className=" relative h-[90.5px] flex flex-col items-center gap-[5px] text-white text-center cursor-pointer has-focus-visible:z-1"
               style={{
-                maskImage: `url(${faviconUrl})`,
+                transition: "scale 200ms",
+                scale: scale ? "0.8" : "1",
+                pointerEvents: delta?.deltaX !== undefined ? "none" : "auto",
               }}
-              className={`size-12 absolute flex bg-black/50 items-center justify-center rounded-sm mask-no-repeat mask-cover`}
             >
-              <div className="size-9 border-3 border-white border-b-transparent rounded-[50%] shrink-0 animate-loading"></div>
-            </div>
-          )}
-          <span
-            className="wrap-anywhere text-[12.5px]/[17px] absolute w-full top-[53px] left-0 select-none"
-            id={`bookmarkTitle${item.id}`}
-          >
-            {!isEditing &&
-              (item.title.length > 12
-                ? item.title.slice(0, 12) + ".."
-                : item.title)}
-            {isEditing && (
+              <img
+                onPointerDown={(e) =>
+                  handlePointerDown(e, item.id, index, item.parentId)
+                }
+                style={{
+                  anchorName: `--anchor-${item.id}`,
+                  scale: delta?.deltaX !== undefined ? "1" : "",
+                }}
+                src={faviconUrl}
+                className="size-12 object-cover object-center rounded-sm select-none transition-all active:scale-95 "
+                id={`bookmarkIcon${item.id}`}
+                alt="Favicon"
+                draggable="false"
+                data-droppable="true"
+              />
+              {isRedirecting && (
+                <div
+                  style={{
+                    maskImage: `url(${faviconUrl})`,
+                  }}
+                  className={`size-12 absolute flex bg-black/50 items-center justify-center rounded-sm mask-no-repeat mask-cover`}
+                >
+                  <div className="size-9 border-3 border-white border-b-transparent rounded-[50%] shrink-0 animate-loading"></div>
+                </div>
+              )}
               <span
-                ref={titleRef}
-                onKeyDown={handleKeyDown}
-                onBlur={handleBlur}
-                contentEditable={true}
-                suppressContentEditableWarning={true}
-                className="block focus-visible:bg-[#333333ad] focus-visible:backdrop-blur-xs"
+                className="wrap-anywhere text-[12.5px]/[17px] absolute w-full top-[53px] left-0 select-none"
+                id={`bookmarkTitle${item.id}`}
               >
-                {item.title}
-              </span>
-            )}
-          </span>{" "}
-          <ContextMenu
-            index={index}
-            handleRename={handleRename}
-            faviconUrl={faviconUrl}
-            id={item.id}
-            item={item}
-            popoverRef={popoverRef}
-            setCurrentFolder={setCurrentFolder}
-            setItemToDelete={setItemToDelete}
-          />
-        </a>
+                {!isEditing && displayedTitle}
+                {isEditing && (
+                  <span
+                    ref={titleRef}
+                    onKeyDown={handleKeyDown}
+                    onBlur={handleBlur}
+                    contentEditable={true}
+                    suppressContentEditableWarning={true}
+                    className="block focus-visible:bg-[#333333ad] focus-visible:backdrop-blur-xs"
+                  >
+                    {item.title}
+                  </span>
+                )}
+              </span>{" "}
+              <ContextMenu
+                index={index}
+                handleRename={handleRename}
+                faviconUrl={faviconUrl}
+                id={item.id}
+                item={item}
+                popoverRef={popoverRef}
+                setCurrentFolder={setCurrentFolder}
+                setItemToDelete={setItemToDelete}
+              />
+            </a>
+          </TooltipTrigger>
+          {isTitleTruncated && !isEditing && (
+            <TooltipContent side="top">{item.title}</TooltipContent>
+          )}
+        </Tooltip>
       </div>
     </li>
   );
