@@ -131,7 +131,7 @@ const Bookmark = memo(function ({
           width: bookmarkWidth + "px",
         }}
       >
-        <Tooltip>
+        <Tooltip delayDuration={500}>
           <TooltipTrigger asChild>
             <a
               href={item.url}

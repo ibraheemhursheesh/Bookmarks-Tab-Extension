@@ -91,13 +91,18 @@ function FolderColorPickerDialog({
 }) {
   return (
     <dialog
+      style={{
+        positionAnchor: "--color-picker",
+        top: "anchor(bottom)",
+        left: "anchor(right)",
+      }}
       ref={colorDialogRef}
       closedby="any"
       onClose={(e) => {
         e.stopPropagation();
         onClearPreviewColor();
       }}
-      className="w-[260px] p-4 m-auto inset-0 cursor-auto rounded-xl border-1 border-black/75  opacity-0 scale-95 starting:open:opacity-0 starting:open:scale-95 open:opacity-100 open:scale-100 transition-all duration-300 transition-discrete ease-out **:font-roboto"
+      className="w-[260px] p-4 inset-0 cursor-auto rounded-xl border-1 border-black/75  opacity-0 scale-95 starting:open:opacity-0 backdrop:bg-transparent starting:open:scale-95 open:opacity-100 open:scale-100 transition-all duration-300 transition-discrete ease-out **:font-roboto"
     >
       <div
         className="grid grid-cols-4 gap-3"
@@ -233,6 +238,7 @@ export default function EditFolder({
               />
             </div>
             <button
+              style={{ anchorName: "--color-picker" }}
               type="button"
               aria-label="Change folder color"
               title="Change folder color"

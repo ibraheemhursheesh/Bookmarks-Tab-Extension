@@ -118,7 +118,7 @@ export default function Folder({
       //     : {}
       // }
     >
-      <Tooltip>
+      <Tooltip delayDuration={500}>
         <TooltipTrigger asChild>
           <div
             id="draggable"

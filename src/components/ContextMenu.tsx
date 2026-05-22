@@ -7,8 +7,52 @@ import { Label } from "@/components/ui/label";
 import styles from "./ContextMenu.module.css";
 import EditBookmark from "./EditBookmark";
 import EditFolder from "./EditFolder";
-import DeleteBookmark from "./DeleteBookmark";
 import MoveBookmarkDialog from "./MoveBookmarkDialog";
+
+function DeleteFolderDialog({ dialogRef, onCancel, onDelete }) {
+  return (
+    <dialog
+      closedby="any"
+      ref={dialogRef}
+      onClose={onCancel}
+      className="w-[80%] max-w-[420px] px-5 py-6 m-auto inset-0 cursor-auto rounded-xl border-1 border-black/75 backdrop:bg-black/50 opacity-0 scale-95 starting:open:opacity-0 starting:open:scale-95 open:opacity-100 open:scale-100 transition-all duration-300 transition-discrete ease-out **:font-roboto"
+    >
+      <form
+        className="flex flex-col gap-5 text-left"
+        onSubmit={(e) => e.preventDefault()}
+      >
+        <div>
+          <h3 className="text-lg leading-snug font-semibold">
+            Are you sure you want to delete this folder
+          </h3>
+          <p className="mt-2 text-sm text-zinc-600">
+            This action will remove all folders and bookmarks inside!
+          </p>
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="bg-zinc-200/50 border-none rounded-full cursor-pointer"
+            onClick={() => dialogRef.current.close("cancel")}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            className="min-w-21 border-none rounded-full bg-[#e7000b] hover:bg-[#c90009] cursor-pointer"
+            onClick={async () => {
+              await onDelete();
+              dialogRef.current.close("delete");
+            }}
+          >
+            Delete
+          </Button>
+        </div>
+      </form>
+    </dialog>
+  );
+}
 
 export default function ContextMenu({
   faviconUrl,
@@ -28,9 +72,20 @@ export default function ContextMenu({
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const isFolder = !item.url;
+  const isNonEmptyFolder = isFolder && item.children?.length > 0;
 
   async function handleDelete() {
     await chrome.bookmarks.removeTree(id);
+  }
+
+  function handleDeleteClick() {
+    if (!isNonEmptyFolder) {
+      handleDelete();
+      return;
+    }
+
+    setIsHidden(true);
+    removeDialogRef.current.showModal();
   }
 
   const handleMoveClick = (e) => {
@@ -191,7 +246,12 @@ export default function ContextMenu({
 
         <li
           className="py-[6px] pl-[13px] pr-10 text-sm flex items-center gap-3 rounded-sm hover:text-[#e7000b] hover:bg-[#e7000b1a]"
-          onClick={handleDelete}
+          onClick={(e) => {
+            if (e.target.closest("dialog")) {
+              return;
+            }
+            handleDeleteClick();
+          }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -218,7 +278,13 @@ export default function ContextMenu({
             />
           </svg>
           <span>Delete</span>
-          {/* <DeleteBookmark id={id} removeDialogRef={removeDialogRef} /> */}
+          {isNonEmptyFolder && (
+            <DeleteFolderDialog
+              dialogRef={removeDialogRef}
+              onCancel={() => setIsHidden(false)}
+              onDelete={handleDelete}
+            />
+          )}
         </li>
       </ul>
       <MoveBookmarkDialog
