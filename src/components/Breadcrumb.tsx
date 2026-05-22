@@ -9,13 +9,14 @@ import {
 import { Fragment, useMemo, useState } from "react";
 import BookmarksActions from "./BookmarksActions";
 import { debounce } from "@/utils/debounce";
-import { SquareArrowOutUpRight } from "lucide-react";
+import { Folder as FolderIcon, SquareArrowOutUpRight } from "lucide-react";
 
 interface BreadcrumbProps {
   path: Array<{ id: string; title: string }>;
   onNavigate: (folderId: string) => void;
   currentFolder: any[];
   setCurrentFolder: (folder: any[] | ((prev: any[]) => any[])) => void;
+  onOpenFolderResult: (folderId: string) => void;
   scrollableContainer: React.RefObject<HTMLDivElement>;
 }
 
@@ -24,6 +25,7 @@ export default function BreadCrumb({
   onNavigate,
   currentFolder,
   setCurrentFolder,
+  onOpenFolderResult,
   scrollableContainer,
 }: BreadcrumbProps) {
   const [searchResults, setSearchResults] = useState([]);
@@ -37,7 +39,6 @@ export default function BreadCrumb({
           const normalizedQuery = String(query || "").toLowerCase();
           const filtered = (results || []).filter(
             (node) =>
-              !!node.url &&
               String(node.title || "")
                 .toLowerCase()
                 .includes(normalizedQuery)
@@ -58,6 +59,16 @@ export default function BreadCrumb({
       return;
     }
     runSearch(value);
+  }
+
+  function closeSearchDialog() {
+    const dialog = document.getElementById("searchResultDialog");
+    dialog?.close();
+  }
+
+  function handleFolderResultClick(folderId) {
+    onOpenFolderResult(folderId);
+    closeSearchDialog();
   }
 
   return (
@@ -138,7 +149,7 @@ export default function BreadCrumb({
         </div>
         {searchQuery.length < 3 ? (
           <div className="h-[calc(100%-42px)] flex items-center justify-center text-base font-medium text-gray-800 italic text-center">
-            Search through all of your bookmarks
+            Search through all of your bookmarks and folders
           </div>
         ) : searchResults?.length > 0 ? (
           <ul
@@ -149,31 +160,50 @@ export default function BreadCrumb({
             }}
             className="m-3 h-[calc(100%-74px)] flex flex-col overflow-y-auto mr-3 ml-7"
           >
-            {searchResults.map((node) => (
-              <li
-                key={node.id}
-                className="cursor-pointer  border-b border-gray-200 mr-2 py-1"
-              >
-                <a
-                  href={node.url}
-                  // target="_blank"
-                  // rel="noreferrer"
-                  className="flex items-center gap-3 text-black hover:bg-gray-100 rounded-md py-1 px-2"
+            {searchResults.map((node) => {
+              const isFolder = !node.url;
+
+              return (
+                <li
+                  key={node.id}
+                  className="cursor-pointer  border-b border-gray-200 mr-2 py-1"
                 >
-                  <img
-                    src={`https://www.faviconextractor.com/favicon/${
-                      new URL(node.url).hostname
-                    }?larger=true`}
-                    alt="favicon"
-                    className="size-7"
-                  />
-                  <span className="text-sm  whitespace-nowrap overflow-hidden overflow-ellipsis flex-1">
-                    {node.title}
-                  </span>
-                  <SquareArrowOutUpRight size={16} />
-                </a>
-              </li>
-            ))}
+                  {isFolder ? (
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-3 text-black hover:bg-gray-100 rounded-md py-1 px-2 cursor-pointer"
+                      onClick={() => handleFolderResultClick(node.id)}
+                    >
+                      <span className="grid size-7 place-items-center rounded-sm bg-zinc-100 text-zinc-700">
+                        <FolderIcon size={18} />
+                      </span>
+                      <span className="text-sm text-left whitespace-nowrap overflow-hidden overflow-ellipsis flex-1">
+                        {node.title}
+                      </span>
+                    </button>
+                  ) : (
+                    <a
+                      href={node.url}
+                      // target="_blank"
+                      // rel="noreferrer"
+                      className="flex items-center gap-3 text-black hover:bg-gray-100 rounded-md py-1 px-2"
+                    >
+                      <img
+                        src={`https://www.faviconextractor.com/favicon/${
+                          new URL(node.url).hostname
+                        }?larger=true`}
+                        alt="favicon"
+                        className="size-7"
+                      />
+                      <span className="text-sm  whitespace-nowrap overflow-hidden overflow-ellipsis flex-1">
+                        {node.title}
+                      </span>
+                      <SquareArrowOutUpRight size={16} />
+                    </a>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <div className="h-[calc(100%-42px)] flex flex-col gap-5 items-center justify-center text-base text-gray-800 italic text-center">
@@ -192,7 +222,7 @@ export default function BreadCrumb({
               <path d="m17 17 L 23 23" data--h-bstatus="0OBSERVED" />
               <circle cx="11" cy="11" r="8" data--h-bstatus="0OBSERVED" />
             </svg>
-            <p className="font-medium">Could not find any bookmarks!</p>
+            <p className="font-medium">Could not find any bookmarks or folders!</p>
           </div>
         )}
         {/* </div> */}

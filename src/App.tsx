@@ -82,6 +82,60 @@ export default function App() {
     }
   };
 
+  function findFolderPath(node, targetFolderId, path = []) {
+    if (!node || node.url) return null;
+
+    const nextPath = [...path, node];
+    if (node.id === targetFolderId) return nextPath;
+
+    for (const child of node.children || []) {
+      const childPath = findFolderPath(child, targetFolderId, nextPath);
+      if (childPath) return childPath;
+    }
+
+    return null;
+  }
+
+  const handleSearchFolderOpen = useCallback(function (folderId) {
+    chrome.bookmarks.getTree((bookmarkTreeNodes) => {
+      const rootFolders = bookmarkTreeNodes[0]?.children || [];
+      const targetPath =
+        rootFolders
+          .map((rootFolder) => findFolderPath(rootFolder, folderId))
+          .find(Boolean) || [];
+
+      const nextFolderPath = targetPath.map((folder, index) => {
+        if (index === 0 && folder.id === "1") {
+          return { id: "Home", title: "Home" };
+        }
+
+        return {
+          id: folder.id,
+          title: folder.title,
+        };
+      });
+
+      chrome.bookmarks.getSubTree(folderId, async (subTree) => {
+        const openFolder = () => {
+          setCurrentFolder(subTree[0]?.children || []);
+          setFolderPath(
+            nextFolderPath.length
+              ? nextFolderPath
+              : [{ id: folderId, title: subTree[0]?.title || "" }]
+          );
+          scrollableContainer.current?.scrollTo(0, 0);
+        };
+
+        if (!document.startViewTransition) {
+          openFolder();
+          return;
+        }
+
+        await document.startViewTransition(openFolder).finished;
+      });
+    });
+  }, []);
+
   // these useCallbacks saved 19 wasted render on every pointermove.
   const handlePointerDown = useCallback(function (e, id, index, parentId) {
     const element = e.target.closest(`[data-droppable="true"]`);
@@ -796,6 +850,7 @@ export default function App() {
           onNavigate={handleBreadcrumbNav}
           currentFolder={currentFolder}
           setCurrentFolder={setCurrentFolder}
+          onOpenFolderResult={handleSearchFolderOpen}
           scrollableContainer={scrollableContainer}
         />
         <Bookmarks
