@@ -39,7 +39,7 @@ export default function BookmarksActions({
   return (
     <div className="ml-auto flex gap-3 items-center">
       <button
-        className="cursor-pointer relative rounded-xs hover:bg-black/20 outline-3 outline-transparent duration-150 hover:outline-black/20 after:absolute after:-inset-2 "
+        className="cursor-pointer relative rounded-xs hover:bg-black/20 outline-3 outline-transparent duration-150 hover:outline-black/20 after:absolute after:-inset-2 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
         onClick={createFolder}
       >
         <svg
@@ -64,7 +64,7 @@ export default function BookmarksActions({
       </button>
 
       <button
-        className="cursor-pointer relative rounded-xs hover:bg-black/20 outline-3 outline-transparent duration-150 hover:outline-black/20 after:absolute after:-inset-2 "
+        className="cursor-pointer relative rounded-xs hover:bg-black/20 outline-3 outline-transparent duration-150 hover:outline-black/20 after:absolute after:-inset-2 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
         onClick={() => {
           const dialog = document.getElementById("searchResultDialog");
           if (dialog) {

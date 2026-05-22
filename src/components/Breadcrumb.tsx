@@ -6,7 +6,7 @@ import {
   BreadcrumbLink,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import BookmarksActions from "./BookmarksActions";
 import { debounce } from "@/utils/debounce";
 import { Folder as FolderIcon, SquareArrowOutUpRight } from "lucide-react";
@@ -30,6 +30,8 @@ export default function BreadCrumb({
 }: BreadcrumbProps) {
   const [searchResults, setSearchResults] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
+  const searchResultRefs = useRef([]);
 
   const runSearch = useMemo(
     () =>
@@ -59,6 +61,39 @@ export default function BreadCrumb({
       return;
     }
     runSearch(value);
+  }
+
+  function focusSearchResult(index) {
+    const resultsCount = searchResults.length;
+    if (!resultsCount) return;
+
+    const nextIndex = (index + resultsCount) % resultsCount;
+    searchResultRefs.current[nextIndex]?.focus();
+  }
+
+  function handleSearchInputKeyDown(e) {
+    if (!searchResults.length) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      focusSearchResult(0);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      focusSearchResult(searchResults.length - 1);
+    }
+  }
+
+  function handleSearchResultKeyDown(e, index) {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      focusSearchResult(index + 1);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      focusSearchResult(index - 1);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      searchInputRef.current?.focus();
+    }
   }
 
   function closeSearchDialog() {
@@ -108,17 +143,20 @@ export default function BreadCrumb({
         onClose={() => {
           setSearchQuery("");
           setSearchResults([]);
+          searchResultRefs.current = [];
         }}
       >
         {/* <div className=""> */}
         <div className="flex items-center gap-2 border-b-2 border-stone-500 mr-5 ml-7 mt-3 pb-1">
           <input
+            ref={searchInputRef}
             className="flex-1 ml-1 text-black text-base border-none outline-none [&::-webkit-search-cancel-button]:hidden min-w-0"
             type="search"
             name=""
             id=""
             value={searchQuery}
             onChange={handleSearch}
+            onKeyDown={handleSearchInputKeyDown}
           />
           <button onClick={() => setSearchQuery("")}>
             <svg
@@ -160,7 +198,7 @@ export default function BreadCrumb({
             }}
             className="m-3 h-[calc(100%-74px)] flex flex-col overflow-y-auto mr-3 ml-7"
           >
-            {searchResults.map((node) => {
+            {searchResults.map((node, index) => {
               const isFolder = !node.url;
 
               return (
@@ -170,9 +208,13 @@ export default function BreadCrumb({
                 >
                   {isFolder ? (
                     <button
+                      ref={(element) => {
+                        searchResultRefs.current[index] = element;
+                      }}
                       type="button"
-                      className="flex w-full items-center gap-3 text-black hover:bg-gray-100 rounded-md py-1 px-2 cursor-pointer"
+                      className="flex w-full items-center gap-3 text-black hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-2 focus-visible:outline-black/35 rounded-md py-1 px-2 cursor-pointer"
                       onClick={() => handleFolderResultClick(node.id)}
+                      onKeyDown={(e) => handleSearchResultKeyDown(e, index)}
                     >
                       <span className="grid size-7 place-items-center rounded-sm bg-zinc-100 text-zinc-700">
                         <FolderIcon size={18} />
@@ -183,10 +225,14 @@ export default function BreadCrumb({
                     </button>
                   ) : (
                     <a
+                      ref={(element) => {
+                        searchResultRefs.current[index] = element;
+                      }}
                       href={node.url}
                       // target="_blank"
                       // rel="noreferrer"
-                      className="flex items-center gap-3 text-black hover:bg-gray-100 rounded-md py-1 px-2"
+                      className="flex items-center gap-3 text-black hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-2 focus-visible:outline-black/35 rounded-md py-1 px-2"
+                      onKeyDown={(e) => handleSearchResultKeyDown(e, index)}
                     >
                       <img
                         src={`https://www.faviconextractor.com/favicon/${

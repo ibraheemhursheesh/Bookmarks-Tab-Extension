@@ -104,7 +104,7 @@ export default function Folder({
       role="button"
       aria-label={`Open folder ${title}`}
       id={id}
-      className="rounded-sm focus-visible:outline-2 focus-visible:outline-white/70"
+      className="rounded-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
       onContextMenu={showContextMenu}
       onClick={handleFolderClick}
       onKeyDown={handleFolderKeyDown}

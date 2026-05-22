@@ -26,7 +26,7 @@ const SettingsIcons = memo(function ({ dialogRef, setBackgroundImage }) {
       </button> */}
 
       <button
-        className="cursor-pointer relative rounded-xs hover:bg-black/20 outline-3 outline-transparent duration-150 hover:outline-black/20 after:absolute after:-inset-2 ml-auto "
+        className="cursor-pointer relative rounded-xs hover:bg-black/20 outline-3 outline-transparent duration-150 hover:outline-black/20 after:absolute after:-inset-2 ml-auto focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
         onClick={() => dialogRef.current.showModal()}
       >
         <svg
@@ -39,7 +39,7 @@ const SettingsIcons = memo(function ({ dialogRef, setBackgroundImage }) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="lucide lucide-image-icon lucide-image"
+          className="lucide lucide-image-icon lucide-image focus-visible:border-ring"
         >
           <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
           <circle cx="9" cy="9" r="2" />
@@ -49,7 +49,7 @@ const SettingsIcons = memo(function ({ dialogRef, setBackgroundImage }) {
 
       <InfoDialog infoDialogRef={infoDialogRef} />
       <button
-        className="cursor-pointer relative rounded-xs hover:bg-black/20 outline-3 outline-transparent duration-150 hover:outline-black/20 after:absolute after:-inset-2 "
+        className="cursor-pointer relative rounded-xs hover:bg-black/20 outline-3 outline-transparent duration-150 hover:outline-black/20 after:absolute after:-inset-2  focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
         onClick={() => infoDialogRef.current.showModal()}
       >
         <svg
