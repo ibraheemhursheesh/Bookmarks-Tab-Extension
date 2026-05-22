@@ -27,15 +27,10 @@ export default function BookmarksActions({
         });
       }
 
-      const newFolder = await chrome.bookmarks.create({
+      await chrome.bookmarks.create({
         parentId: currentFolderId,
         title: "",
       });
-
-      setCurrentFolder((prev) => [
-        ...prev,
-        { ...newFolder, children: [], isNewlyCreated: true },
-      ]);
     } catch (error) {
       console.error("Failed to create folder:", error);
     }

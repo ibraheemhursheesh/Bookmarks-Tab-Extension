@@ -18,8 +18,13 @@ const transitionDuration = 300;
 
 export default function App() {
   const [folderPath, setFolderPath] = useState([{ id: "Home", title: "Home" }]);
+  const activeFolderId =
+    folderPath[folderPath.length - 1].id === "Home"
+      ? "1"
+      : folderPath[folderPath.length - 1].id;
 
-  const [currentFolder, setCurrentFolder, allBookmarks] = useBookmarks([]);
+  const [currentFolder, setCurrentFolder, allBookmarks] =
+    useBookmarks(activeFolderId);
   const dialog = useRef(null);
   const [gridColumnNumber, setGridColumnNumber] = useState(null);
   const listGrid = useRef(null);

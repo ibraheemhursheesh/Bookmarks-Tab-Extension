@@ -1,59 +1,101 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { arrayMove } from "../utils/arrayMove";
+function getBookmarksBarChildren(bookmarkTreeNodes) {
+  return bookmarkTreeNodes?.[0]?.children?.[0]?.children || [];
+}
 
-export function useBookmarks() {
+export function useBookmarks(activeFolderId = "1") {
   const [bookmarks, setBookmarks] = useState([]);
   const allBookmarks = useRef([]);
+  const activeFolderIdRef = useRef(activeFolderId);
+  const refreshTimeoutRef = useRef(null);
 
-  useEffect(function () {
-    chrome.bookmarks.getTree((bookmarkTreeNodes) => {
-      const bookmarksBar = bookmarkTreeNodes[0].children[0].children;
-      setBookmarks(bookmarksBar);
-      allBookmarks.current = bookmarksBar;
-    });
-
-    chrome.bookmarks.onChanged.addListener((id, changeInfo) => {
-      const { title, url } = changeInfo;
-      setBookmarks((prevBookmarks) => {
-        return prevBookmarks.map((bookmark) =>
-          bookmark.id === id ? { ...bookmark, title, url } : bookmark
+  const loadFolder = useCallback((folderId, options = {}) => {
+    if (folderId === "1") {
+      chrome.bookmarks.getTree((bookmarkTreeNodes) => {
+        const bookmarksBar = getBookmarksBarChildren(bookmarkTreeNodes);
+        const nextBookmarks = bookmarksBar.map((bookmark) =>
+          bookmark.id === options.newlyCreatedId
+            ? { ...bookmark, isNewlyCreated: true }
+            : bookmark
         );
+        setBookmarks(nextBookmarks);
+        allBookmarks.current = bookmarksBar;
       });
-    });
+      return;
+    }
 
-    chrome.bookmarks.onRemoved.addListener((id, removeInfo) => {
-      setBookmarks((prevBookmarks) =>
-        prevBookmarks.filter((bookmark) => bookmark.id !== id)
-      );
-    });
-
-    chrome.bookmarks.onMoved.addListener((id, moveInfo) => {
-      const { index, oldIndex, parentId, oldParentId } = moveInfo;
-      if (parentId === oldParentId) {
-        // setBookmarks((bookmarks) => arrayMove(bookmarks, oldIndex, index));
-      } else {
-        // setBookmarks((bookmarks) => {
-        //   return bookmarks
-        //     .map((bookmark) =>
-        //       bookmark.id === parentId
-        //         ? {
-        //             ...bookmark,
-        //             children: [...bookmark.children, bookmarks[oldIndex]],
-        //           }
-        //         : bookmark
-        //     )
-        //     .filter((bookmark) => bookmark.id !== id);
-        // });
+    chrome.bookmarks.getSubTree(folderId, (subTree) => {
+      if (chrome.runtime.lastError || !subTree?.[0]) {
+        chrome.bookmarks.getTree((bookmarkTreeNodes) => {
+          const bookmarksBar = getBookmarksBarChildren(bookmarkTreeNodes);
+          setBookmarks(bookmarksBar);
+          allBookmarks.current = bookmarksBar;
+        });
+        return;
       }
-    });
 
-    return () => {
-      chrome.bookmarks.onChanged.removeListener();
-      chrome.bookmarks.onRemoved.removeListener();
-      chrome.bookmarks.onMoved.removeListener();
-    };
+      const nextBookmarks = (subTree[0].children || []).map((bookmark) =>
+        bookmark.id === options.newlyCreatedId
+          ? { ...bookmark, isNewlyCreated: true }
+          : bookmark
+      );
+      setBookmarks(nextBookmarks);
+    });
   }, []);
+
+  const refreshCurrentFolder = useCallback(
+    (options = {}) => {
+      window.clearTimeout(refreshTimeoutRef.current);
+      refreshTimeoutRef.current = window.setTimeout(() => {
+        loadFolder(activeFolderIdRef.current, options);
+      }, 50);
+    },
+    [loadFolder]
+  );
+
+  useEffect(
+    function () {
+      activeFolderIdRef.current = activeFolderId;
+      loadFolder(activeFolderId);
+    },
+    [activeFolderId, loadFolder]
+  );
+
+  useEffect(
+    function () {
+      const handleCreated = (id, node) => {
+        refreshCurrentFolder({
+          newlyCreatedId:
+            node.parentId === activeFolderIdRef.current && node.title === ""
+              ? id
+              : null,
+        });
+      };
+      const handleChanged = () => refreshCurrentFolder();
+      const handleRemoved = () => refreshCurrentFolder();
+      const handleMoved = () => refreshCurrentFolder();
+      const handleChildrenReordered = () => refreshCurrentFolder();
+
+      chrome.bookmarks.onCreated.addListener(handleCreated);
+      chrome.bookmarks.onChanged.addListener(handleChanged);
+      chrome.bookmarks.onRemoved.addListener(handleRemoved);
+      chrome.bookmarks.onMoved.addListener(handleMoved);
+      chrome.bookmarks.onChildrenReordered.addListener(handleChildrenReordered);
+
+      return () => {
+        window.clearTimeout(refreshTimeoutRef.current);
+        chrome.bookmarks.onCreated.removeListener(handleCreated);
+        chrome.bookmarks.onChanged.removeListener(handleChanged);
+        chrome.bookmarks.onRemoved.removeListener(handleRemoved);
+        chrome.bookmarks.onMoved.removeListener(handleMoved);
+        chrome.bookmarks.onChildrenReordered.removeListener(
+          handleChildrenReordered
+        );
+      };
+    },
+    [refreshCurrentFolder]
+  );
 
   return [bookmarks, setBookmarks, allBookmarks.current];
 }
