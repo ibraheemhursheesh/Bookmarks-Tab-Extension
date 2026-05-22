@@ -261,6 +261,7 @@ export default function EditFolder({
                 autoComplete="off"
                 spellCheck={false}
                 type="text"
+                dir="ltr"
                 className="mt-2 font-mono text-xs"
                 onChange={(e) => {
                   setSvgInput(e.target.value);

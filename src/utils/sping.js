@@ -1,7 +1,7 @@
 const [duration, func] = createSpring({
-  mass: 1,
-  stiffness: 100,
-  damping: 10,
+  mass: 1.75,
+  stiffness: 400,
+  damping: 16.7,
   velocity: 0,
 });
 

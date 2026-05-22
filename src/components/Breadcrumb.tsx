@@ -6,7 +6,7 @@ import {
   BreadcrumbLink,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import BookmarksActions from "./BookmarksActions";
 import { debounce } from "@/utils/debounce";
 import { Folder as FolderIcon, SquareArrowOutUpRight } from "lucide-react";
@@ -101,10 +101,42 @@ export default function BreadCrumb({
     dialog?.close();
   }
 
+  function openSearchDialog() {
+    const dialog = document.getElementById("searchResultDialog");
+    const otherOpenDialog = document.querySelector(
+      'dialog[open]:not(#searchResultDialog)'
+    );
+
+    if (!dialog || otherOpenDialog) return;
+
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+
+    requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
+  }
+
   function handleFolderResultClick(folderId) {
     onOpenFolderResult(folderId);
     closeSearchDialog();
   }
+
+  useEffect(function () {
+    function handleGlobalKeyDown(e) {
+      if (e.ctrlKey && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        openSearchDialog();
+      }
+    }
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, []);
 
   return (
     <div
