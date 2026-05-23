@@ -17,6 +17,8 @@ interface BreadcrumbProps {
   currentFolder: any[];
   setCurrentFolder: (folder: any[] | ((prev: any[]) => any[])) => void;
   onOpenFolderResult: (folderId: string) => void;
+  sourceFolder: { id: string; title: string };
+  onSourceFolderChange: (folder: { id: string; title: string }) => void;
   scrollableContainer: React.RefObject<HTMLDivElement>;
 }
 
@@ -26,6 +28,8 @@ export default function BreadCrumb({
   currentFolder,
   setCurrentFolder,
   onOpenFolderResult,
+  sourceFolder,
+  onSourceFolderChange,
   scrollableContainer,
 }: BreadcrumbProps) {
   const [searchResults, setSearchResults] = useState([]);
@@ -310,6 +314,8 @@ export default function BreadCrumb({
         currentFolder={currentFolder}
         setCurrentFolder={setCurrentFolder}
         folderPath={path}
+        sourceFolder={sourceFolder}
+        onSourceFolderChange={onSourceFolderChange}
         scrollableContainer={scrollableContainer}
       />
     </div>

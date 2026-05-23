@@ -15,16 +15,19 @@ import BookmarkItem from "./components/BookmarkItem";
 import DraggedBookmarkClone from "./components/DraggedBookmarkClone";
 
 const transitionDuration = 300;
+const defaultSourceFolder = { id: "1", title: "Home" };
 
 export default function App() {
   const [folderPath, setFolderPath] = useState([{ id: "Home", title: "Home" }]);
+  const [sourceFolder, setSourceFolder] = useState(defaultSourceFolder);
+  const [sourceFolderLoaded, setSourceFolderLoaded] = useState(false);
   const activeFolderId =
     folderPath[folderPath.length - 1].id === "Home"
-      ? "1"
+      ? sourceFolder.id
       : folderPath[folderPath.length - 1].id;
 
   const [currentFolder, setCurrentFolder, allBookmarks] =
-    useBookmarks(activeFolderId);
+    useBookmarks(activeFolderId, sourceFolderLoaded);
   const dialog = useRef(null);
   const [gridColumnNumber, setGridColumnNumber] = useState(null);
   const listGrid = useRef(null);
@@ -53,6 +56,27 @@ export default function App() {
   const gridGap = 16;
   const move = bookmarkWidth + gridGap;
 
+  useEffect(function () {
+    chrome.storage.local.get("sourceFolder", (result) => {
+      if (result.sourceFolder?.id) {
+        setSourceFolder(result.sourceFolder);
+      }
+      setSourceFolderLoaded(true);
+    });
+  }, []);
+
+  const handleSourceFolderChange = useCallback(function (folder) {
+    const nextSourceFolder = {
+      id: folder.id,
+      title: folder.title || "Home",
+    };
+
+    setSourceFolder(nextSourceFolder);
+    setFolderPath([{ id: "Home", title: "Home" }]);
+    chrome.storage.local.set({ sourceFolder: nextSourceFolder });
+    scrollableContainer.current?.scrollTo(0, 0);
+  }, []);
+
   const handleFolderNavigation = useCallback(function (folderId, folderTitle) {
     if (folderId === "Home") {
       setFolderPath([{ id: "Home", title: "Home" }]);
@@ -64,7 +88,7 @@ export default function App() {
   const handleBreadcrumbNav = (folderId: string) => {
     const index = folderPath.findIndex((folder) => folder.id === folderId);
     if (index !== -1) {
-      const id = folderId === "Home" ? "1" : folderId;
+      const id = folderId === "Home" ? sourceFolder.id : folderId;
 
       chrome.bookmarks.getSubTree(id, async (subTree) => {
         if (!document.startViewTransition) {
@@ -105,7 +129,7 @@ export default function App() {
           .find(Boolean) || [];
 
       const nextFolderPath = targetPath.map((folder, index) => {
-        if (index === 0 && folder.id === "1") {
+        if (index === 0 && folder.id === sourceFolder.id) {
           return { id: "Home", title: "Home" };
         }
 
@@ -134,7 +158,7 @@ export default function App() {
         await document.startViewTransition(openFolder).finished;
       });
     });
-  }, []);
+  }, [sourceFolder.id]);
 
   // these useCallbacks saved 19 wasted render on every pointermove.
   const handlePointerDown = useCallback(function (e, id, index, parentId) {
@@ -720,7 +744,8 @@ export default function App() {
             );
             setMovedElements([]);
             chrome.bookmarks.move(id, {
-              parentId: targetFolderId === "Home" ? "1" : targetFolderId,
+              parentId:
+                targetFolderId === "Home" ? sourceFolder.id : targetFolderId,
             });
             // update the view to target folder
             // const targetIdForView =
@@ -851,6 +876,8 @@ export default function App() {
           currentFolder={currentFolder}
           setCurrentFolder={setCurrentFolder}
           onOpenFolderResult={handleSearchFolderOpen}
+          sourceFolder={sourceFolder}
+          onSourceFolderChange={handleSourceFolderChange}
           scrollableContainer={scrollableContainer}
         />
         <Bookmarks

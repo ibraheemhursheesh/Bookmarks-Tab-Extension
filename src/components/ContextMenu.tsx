@@ -372,6 +372,7 @@ export default function ContextMenu({
         isOpen={isMoveDialogOpen}
         onClose={() => setIsMoveDialogOpen(false)}
         onMove={handleMove}
+        buttonLabel={"Move"}
       />
     </div>
   );

@@ -19,6 +19,8 @@ interface MoveBookmarkDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onMove: (folderId: string) => void;
+  initialSelectedFolderId?: string | null;
+  buttonLabel?: string;
 }
 
 const FolderTree = ({
@@ -98,6 +100,8 @@ export default function MoveBookmarkDialog({
   isOpen,
   onClose,
   onMove,
+  initialSelectedFolderId = null,
+  buttonLabel = "Save",
 }: MoveBookmarkDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [rootFolders, setRootFolders] = useState([]);
@@ -110,13 +114,14 @@ export default function MoveBookmarkDialog({
         setRootFolders(mainFolders);
       });
 
+      setSelectedFolderId(initialSelectedFolderId);
       dialogRef.current?.showModal();
     } else {
       dialogRef.current?.close();
       // Reset selection when dialog closes
       setSelectedFolderId(null);
     }
-  }, [isOpen]);
+  }, [isOpen, initialSelectedFolderId]);
 
   const updateFolderRecursive = (folders, folderId) => {
     return folders.map((folder) => {
@@ -155,9 +160,13 @@ export default function MoveBookmarkDialog({
       onClick={handleDialogClick}
     >
       <div className=" flex flex-col gap-5 h-[420px] p-4">
-        {/* <div className="text-left ">
-          <h2 className="text-lg font-semibold">Move to Folder</h2>
-        </div> */}
+        <div className="text-left ">
+          <h2 className="text-lg font-semibold">
+            {buttonLabel === "Save"
+              ? "Choose Folder to Import from"
+              : "Move to Folder"}
+          </h2>
+        </div>
 
         <ul
           style={{ scrollbarWidth: "thin", scrollbarColor: "#333 #e4e4e7" }}
@@ -191,7 +200,7 @@ export default function MoveBookmarkDialog({
               }
             }}
           >
-            Save
+            {buttonLabel}
           </Button>
         </div>
       </div>

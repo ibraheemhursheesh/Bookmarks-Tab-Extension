@@ -4,7 +4,7 @@ function getBookmarksBarChildren(bookmarkTreeNodes) {
   return bookmarkTreeNodes?.[0]?.children?.[0]?.children || [];
 }
 
-export function useBookmarks(activeFolderId = "1") {
+export function useBookmarks(activeFolderId = "1", enabled = true) {
   const [bookmarks, setBookmarks] = useState([]);
   const allBookmarks = useRef([]);
   const activeFolderIdRef = useRef(activeFolderId);
@@ -56,14 +56,18 @@ export function useBookmarks(activeFolderId = "1") {
 
   useEffect(
     function () {
+      if (!enabled) return;
+
       activeFolderIdRef.current = activeFolderId;
       loadFolder(activeFolderId);
     },
-    [activeFolderId, loadFolder]
+    [activeFolderId, enabled, loadFolder]
   );
 
   useEffect(
     function () {
+      if (!enabled) return;
+
       const handleCreated = (id, node) => {
         refreshCurrentFolder({
           newlyCreatedId:
@@ -94,7 +98,7 @@ export function useBookmarks(activeFolderId = "1") {
         );
       };
     },
-    [refreshCurrentFolder]
+    [enabled, refreshCurrentFolder]
   );
 
   return [bookmarks, setBookmarks, allBookmarks.current];
