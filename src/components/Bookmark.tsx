@@ -107,6 +107,17 @@ const Bookmark = memo(function ({
     setIsRedirecting(true);
   }
 
+  // function handleBookmarkKeyDown(e) {
+  //   if (isEditing || e.target.isContentEditable) {
+  //     return;
+  //   }
+
+  //   if ((e.shiftKey && e.key === "F10") || e.key === "ContextMenu") {
+  //     e.preventDefault();
+  //     popoverRef.current?.showPopover();
+  //   }
+  // }
+
   return (
     <li
       style={{
@@ -136,6 +147,7 @@ const Bookmark = memo(function ({
             <a
               href={item.url}
               onClick={handleAnchorClick}
+              // onKeyDown={handleBookmarkKeyDown}
               draggable="false"
               className=" relative h-[90.5px] flex flex-col items-center gap-[5px] text-white text-center cursor-pointer has-focus-visible:z-1"
               style={{

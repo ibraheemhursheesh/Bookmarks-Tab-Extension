@@ -88,6 +88,12 @@ export default function Folder({
       return;
     }
 
+    if ((e.shiftKey && e.key === "F10") || e.key === "ContextMenu") {
+      e.preventDefault();
+      popoverRef.current?.showPopover();
+      return;
+    }
+
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       folderIconRef.current?.click();

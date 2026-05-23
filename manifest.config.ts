@@ -10,8 +10,7 @@ export default defineManifest({
   chrome_url_overrides: {
     newtab: "src/index.html",
   },
-  permissions: ["favicon", "bookmarks", "storage", "unlimitedStorage"],
-  host_permissions: ["http://127.0.0.1:3333"],
+  permissions: ["bookmarks", "storage", "unlimitedStorage"],
   icons: {
     "48": "icon48.png",
     "128": "icon128.png",

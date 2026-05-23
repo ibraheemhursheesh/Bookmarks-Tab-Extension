@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -74,6 +74,67 @@ export default function ContextMenu({
   const isFolder = !item.url;
   const isNonEmptyFolder = isFolder && item.children?.length > 0;
 
+  function getMenuItems() {
+    return Array.from(
+      popoverRef.current?.querySelectorAll('[data-context-menu-item="true"]') ||
+        [],
+    );
+  }
+
+  function focusMenuItem(index) {
+    const menuItems = getMenuItems();
+    if (!menuItems.length) return;
+
+    const nextIndex = (index + menuItems.length) % menuItems.length;
+    menuItems[nextIndex]?.focus();
+  }
+
+  function handleMenuItemKeyDown(e) {
+    if (e.target.closest("dialog")) {
+      return;
+    }
+
+    const menuItems = getMenuItems();
+    const currentIndex = menuItems.indexOf(e.currentTarget);
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      focusMenuItem(currentIndex + 1);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      focusMenuItem(currentIndex - 1);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      focusMenuItem(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      focusMenuItem(menuItems.length - 1);
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      e.currentTarget.click();
+    }
+  }
+
+  useEffect(
+    function () {
+      const popover = popoverRef.current;
+      if (!popover) return;
+
+      function handlePopoverToggle(e) {
+        if (e.newState === "open") {
+          requestAnimationFrame(() => focusMenuItem(0));
+        }
+      }
+
+      popover.addEventListener("toggle", handlePopoverToggle);
+
+      return () => {
+        popover.removeEventListener("toggle", handlePopoverToggle);
+      };
+    },
+    [popoverRef],
+  );
+
   async function handleDelete() {
     await chrome.bookmarks.removeTree(id);
   }
@@ -113,11 +174,15 @@ export default function ContextMenu({
       popover="auto"
       id={`contextMenu${id}`}
     >
-      <ul>
+      <ul role="menu">
         {actions.map((action, actionIndex) => (
           <li
-            className="py-[6px] px-3 text-sm flex items-center gap-2 cursor-pointer rounded-sm hover:bg-[#eee]"
+            role="menuitem"
+            tabIndex={-1}
+            data-context-menu-item="true"
+            className="py-[6px] px-3 text-sm flex items-center gap-2 cursor-pointer rounded-sm hover:bg-[#eee] focus-visible:bg-[#eee] focus-visible:outline-none"
             key={`${String(action.name)}-${actionIndex}`}
+            onKeyDown={handleMenuItemKeyDown}
             onClick={(e) => {
               action.onClick(e);
             }}
@@ -142,9 +207,13 @@ export default function ContextMenu({
       popover="auto"
       id={`contextMenu${id}`}
     >
-      <ul>
+      <ul role="menu">
         <li
-          className="py-[6px] pl-[13px] pr-10 text-sm flex items-center gap-3 rounded-sm hover:text-black hover:bg-zinc-200/50"
+          role="menuitem"
+          tabIndex={-1}
+          data-context-menu-item="true"
+          className="py-[6px] pl-[13px] pr-10 text-sm flex items-center gap-3 rounded-sm hover:text-black hover:bg-zinc-200/50 focus-visible:text-black focus-visible:bg-zinc-200/50 focus-visible:outline-none"
+          onKeyDown={handleMenuItemKeyDown}
           onClick={() => {
             popoverRef.current.hidePopover();
             handleRename(true);
@@ -173,7 +242,11 @@ export default function ContextMenu({
         </li>
         {(faviconUrl || isFolder) && (
           <li
-            className="py-[6px] pl-[13px] pr-10 text-sm flex items-center gap-3 rounded-sm hover:text-black hover:bg-zinc-200/50"
+            role="menuitem"
+            tabIndex={-1}
+            data-context-menu-item="true"
+            className="py-[6px] pl-[13px] pr-10 text-sm flex items-center gap-3 rounded-sm hover:text-black hover:bg-zinc-200/50 focus-visible:text-black focus-visible:bg-zinc-200/50 focus-visible:outline-none"
+            onKeyDown={handleMenuItemKeyDown}
             onClick={(e) => {
               if (!e.target.closest("dialog")) {
                 setIsHidden(true);
@@ -222,7 +295,11 @@ export default function ContextMenu({
         )}
 
         <li
-          className="py-[6px] pl-[13px] pr-10 text-sm flex items-center gap-3 rounded-sm hover:text-black hover:bg-zinc-200/50"
+          role="menuitem"
+          tabIndex={-1}
+          data-context-menu-item="true"
+          className="py-[6px] pl-[13px] pr-10 text-sm flex items-center gap-3 rounded-sm hover:text-black hover:bg-zinc-200/50 focus-visible:text-black focus-visible:bg-zinc-200/50 focus-visible:outline-none"
+          onKeyDown={handleMenuItemKeyDown}
           onClick={handleMoveClick}
         >
           <svg
@@ -245,7 +322,11 @@ export default function ContextMenu({
         </li>
 
         <li
-          className="py-[6px] pl-[13px] pr-10 text-sm flex items-center gap-3 rounded-sm hover:text-[#e7000b] hover:bg-[#e7000b1a]"
+          role="menuitem"
+          tabIndex={-1}
+          data-context-menu-item="true"
+          className="py-[6px] pl-[13px] pr-10 text-sm flex items-center gap-3 rounded-sm hover:text-[#e7000b] hover:bg-[#e7000b1a] focus-visible:text-[#e7000b] focus-visible:bg-[#e7000b1a] focus-visible:outline-none"
+          onKeyDown={handleMenuItemKeyDown}
           onClick={(e) => {
             if (e.target.closest("dialog")) {
               return;

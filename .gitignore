@@ -25,3 +25,8 @@ dist-ssr
 *.sw?
 
 *.txt
+
+
+# secrets:
+dist.crx
+dist.pem

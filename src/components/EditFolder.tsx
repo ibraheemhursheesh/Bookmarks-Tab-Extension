@@ -155,8 +155,22 @@ export default function EditFolder({
   const [selectedFolderColor, setSelectedFolderColor] = useState(folderColor);
   const [hoveredFolderColor, setHoveredFolderColor] = useState(null);
   const colorDialogRef = useRef(null);
+  const svgHelpPopoverRef = useRef(null);
   const previewSvg = parseFolderSvg(svgInput).svg;
   const previewFolderColor = hoveredFolderColor || selectedFolderColor;
+  const svgHelpAnchorName = `--folder-svg-help-${id}`;
+
+  function showSvgHelpPopover() {
+    if (!svgHelpPopoverRef.current?.matches(":popover-open")) {
+      svgHelpPopoverRef.current?.showPopover();
+    }
+  }
+
+  function hideSvgHelpPopover() {
+    if (svgHelpPopoverRef.current?.matches(":popover-open")) {
+      svgHelpPopoverRef.current?.hidePopover();
+    }
+  }
 
   async function saveFolderSettings(nextSvg, nextFolderColor) {
     const result = await chrome.storage.local.get(id);
@@ -254,20 +268,65 @@ export default function EditFolder({
             <h3 className="text-lg leading-none font-semibold">Edit Folder</h3>
             <div className="mt-6">
               <Label htmlFor={`folder-svg-${id}`}>SVG</Label>
-              <Input
-                id={`folder-svg-${id}`}
-                name={`folder-svg-${id}`}
-                value={svgInput}
-                autoComplete="off"
-                spellCheck={false}
-                type="text"
-                dir="ltr"
-                className="mt-2 font-mono text-xs"
-                onChange={(e) => {
-                  setSvgInput(e.target.value);
-                  setSvgError("");
-                }}
-              />
+              <div className="flex items-center gap-2 mt-2">
+                <Input
+                  id={`folder-svg-${id}`}
+                  name={`folder-svg-${id}`}
+                  value={svgInput}
+                  autoComplete="off"
+                  spellCheck={false}
+                  type="text"
+                  dir="ltr"
+                  className="font-mono text-xs"
+                  onChange={(e) => {
+                    setSvgInput(e.target.value);
+                    setSvgError("");
+                  }}
+                />
+                <button
+                  type="button"
+                  aria-label="SVG icon help"
+                  aria-describedby={`folder-svg-help-${id}`}
+                  className="grid size-8 shrink-0 place-items-center rounded-full text-[#333] hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-black/40"
+                  style={{ anchorName: svgHelpAnchorName }}
+                  onMouseEnter={showSvgHelpPopover}
+                  onMouseLeave={hideSvgHelpPopover}
+                  onFocus={showSvgHelpPopover}
+                  onBlur={hideSvgHelpPopover}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-info-icon lucide-info"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16v-4" />
+                    <path d="M12 8h.01" />
+                  </svg>
+                </button>
+                <div
+                  id={`folder-svg-help-${id}`}
+                  ref={svgHelpPopoverRef}
+                  popover="manual"
+                  style={{
+                    positionAnchor: svgHelpAnchorName,
+                    bottom: "anchor(top)",
+                    left: "anchor(center)",
+                    transform: "translateX(-50%)",
+                  }}
+                  className="inset-auto mb-2 max-w-54 rounded-md border border-black/10 bg-[#333] px-3 py-1.5 text-xs leading-snug text-white shadow-md"
+                >
+                  Visit https://lucide.dev to find a good icon to use
+                </div>
+              </div>
             </div>
             {svgError && (
               <div className="mt-2 text-[13px] text-red-500">{svgError}</div>
