@@ -57,8 +57,6 @@ export default function BookmarksActions({
       <button
         className="cursor-pointer relative rounded-xs hover:bg-black/20 outline-3 outline-transparent duration-150 hover:outline-black/20 after:absolute after:-inset-2 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
         onClick={() => setIsSourceFolderDialogOpen(true)}
-        aria-label="Choose source folder"
-        title="Choose source folder"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

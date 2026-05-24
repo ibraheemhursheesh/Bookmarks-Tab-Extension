@@ -36,6 +36,7 @@ export default function BreadCrumb({
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef(null);
   const searchResultRefs = useRef([]);
+  const breadcrumbItemRefs = useRef([]);
 
   const runSearch = useMemo(
     () =>
@@ -127,6 +128,33 @@ export default function BreadCrumb({
     closeSearchDialog();
   }
 
+  function focusBreadcrumbItem(index) {
+    const itemsCount = path.length;
+    if (!itemsCount) return;
+
+    const nextIndex = (index + itemsCount) % itemsCount;
+    breadcrumbItemRefs.current[nextIndex]?.focus();
+  }
+
+  function handleBreadcrumbKeyDown(e, folderId, index) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onNavigate(folderId);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      focusBreadcrumbItem(index + 1);
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      focusBreadcrumbItem(index - 1);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      focusBreadcrumbItem(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      focusBreadcrumbItem(path.length - 1);
+    }
+  }
+
   useEffect(function () {
     function handleGlobalKeyDown(e) {
       if (e.ctrlKey && e.key.toLowerCase() === "k") {
@@ -156,8 +184,16 @@ export default function BreadCrumb({
               <Fragment key={folder.id}>
                 <BreadcrumbItem id={folder.id} data-path-droppable="true">
                   <BreadcrumbLink
-                    className="cursor-pointer relative text-[13.5px] rounded-xs transition-colors duration-150  hover:bg-black/20 outline-2 px-1 outline-transparent hover:outline-black/20 after:absolute after:-inset-2"
+                    ref={(element) => {
+                      breadcrumbItemRefs.current[index] = element;
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    className="cursor-pointer relative text-[13.5px] rounded-xs transition-colors duration-150 hover:bg-black/20 outline-2 px-1 outline-transparent hover:outline-black/20 focus-visible:bg-black/20 focus-visible:outline-black/20 after:absolute after:-inset-2"
                     onClick={() => onNavigate(folder.id)}
+                    onKeyDown={(e) =>
+                      handleBreadcrumbKeyDown(e, folder.id, index)
+                    }
                   >
                     {folder.title === "" ? "_" : folder.title}
                   </BreadcrumbLink>

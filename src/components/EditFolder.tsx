@@ -115,7 +115,7 @@ function FolderColorPickerDialog({
             <button
               key={`${color.inside}-${color.outside}`}
               type="button"
-              aria-label="Choose folder color"
+
               className="grid size-10 place-items-center rounded-md border border-black/10 bg-white cursor-pointer outline-2 outline-offset-2 outline-transparent focus-visible:outline-black/50"
               style={{
                 outlineColor: isSelected ? color.outside : "",
@@ -254,7 +254,6 @@ export default function EditFolder({
             <button
               style={{ anchorName: "--color-picker" }}
               type="button"
-              aria-label="Change folder color"
               title="Change folder color"
               className="grid size-8 place-items-center rounded-full bg-zinc-100 text-zinc-700 hover:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-black/50 cursor-pointer"
               onClick={() => {
@@ -285,7 +284,6 @@ export default function EditFolder({
                 />
                 <button
                   type="button"
-                  aria-label="SVG icon help"
                   aria-describedby={`folder-svg-help-${id}`}
                   className="grid size-8 shrink-0 place-items-center rounded-full text-[#333] hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-black/40"
                   style={{ anchorName: svgHelpAnchorName }}
